@@ -1,0 +1,37 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-sm-4">
+      <h1>New Location</h1>
+    </div>
+    <div class="col-sm-8">
+      <div *ngIf="editForm.dirty" class="alert alert-info">
+        <strong>Information: </strong> You have made changes. Any unsaved changes will be lost!
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="card">
+        <img [src]="imgURL" class="card-img-top img-thumbnail" *ngIf="imgURL">
+        <img src="../../../assets/no-thumbnail.jpg" class="card-img-top img-thumbnail" *ngIf="!imgURL">
+        <div class="card-body">
+            <div class="card-footer">
+                <button [disabled]="!editForm.dirty" form="createForm" class="btn btn-success btn-block">Save Changes</button>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <div class="tab-panel">
+          <form #editForm="ngForm" id="createForm" (ngSubmit)="createLocation()">
+              <h4>Name</h4>
+              <input class="form-control mb-3" type="text" name="name" [(ngModel)]="location.name">
+              <h4>Address</h4>
+              <input class="form-control mb-3" type="text" name="name" [(ngModel)]="location.address">
+              <h4>Select image</h4>
+              <input #file type="file" accept='image/*' (change)="preview(file.files)" />
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
