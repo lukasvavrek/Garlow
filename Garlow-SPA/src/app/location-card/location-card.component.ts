@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '../_models/location';
+import { LocationService } from '../_services/location.service';
 
 @Component({
   selector: 'app-location-card',
@@ -9,7 +10,7 @@ import { Location } from '../_models/location';
 export class LocationCardComponent implements OnInit {
   @Input() location: Location;
 
-  constructor() { }
+  constructor(private locationService: LocationService) { }
 
   ngOnInit() {
   }

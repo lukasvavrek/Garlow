@@ -15,6 +15,14 @@ export class LocationService {
     return this.http.get(this.baseUrl + 'locations/foruser/' + userId);
   }
 
+  getLocation(locationId: number) {
+    return this.http.get(this.baseUrl + 'locations/' + locationId);
+  }
+
+  deleteLocation(locationId: number) {
+    return this.http.delete(this.baseUrl + 'locations/' + locationId);
+  }
+
   createNewLocation(userId: number, location: Location, photo: File) {
     const formData = new FormData();
     formData.append('photo', photo);

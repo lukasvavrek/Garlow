@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
+import { ClipboardModule } from 'ngx-clipboard';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -35,6 +36,8 @@ import { LocationsListComponent } from './locations-list/locations-list.componen
 import { LocationsListResolver } from './_resolvers/locations-list.resolver';
 import { LocationService } from './_services/location.service';
 import { LocationCardComponent } from './location-card/location-card.component';
+import { LocationDetailComponent } from './location-detail/location-detail.component';
+import { LocationDetailResolver } from './_resolvers/location-detail.resolver';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -55,7 +58,8 @@ export function tokenGetter() {
       PhotoEditorComponent,
       AddLocationComponent,
       LocationsListComponent,
-      LocationCardComponent
+      LocationCardComponent,
+      LocationDetailComponent
    ],
    imports: [
       BrowserModule,
@@ -67,6 +71,7 @@ export function tokenGetter() {
       RouterModule.forRoot(appRoutes),
       NgxGalleryModule,
       FileUploadModule,
+      ClipboardModule,
       JwtModule.forRoot({
          config: {
             tokenGetter,
@@ -86,7 +91,8 @@ export function tokenGetter() {
       MemberEditResolver,
       PreventUnsavedChanges,
       LocationsListResolver,
-      LocationService
+      LocationService,
+      LocationDetailResolver
    ],
    bootstrap: [
       AppComponent

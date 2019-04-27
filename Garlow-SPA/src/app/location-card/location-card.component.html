@@ -2,8 +2,8 @@
   <div class="card-img-wrapper">
     <img class="card-img-top" src="{{location.photoUrl}}" alt="{{location.name}}">
     <ul class="list-inline member-icons animate text-center">
-      <li class="list-inline-item"><button class="btn btn-primary" [routerLink]="['/locations/', location.id]"><i class="fa fa-info"></i></button></li>
-      <li class="list-inline-item"><button class="btn btn-primary"><i class="fa fa-trash"></i></button></li>
+      <li class="list-inline-item"><button class="btn btn-primary" [routerLink]="['/locations/', location.id]">Detail</button></li>
+      <!-- <li class="list-inline-item"><button class="btn btn-primary" (click)="deleteLocation()"><i class="fa fa-trash"></i></button></li> -->
     </ul>
   </div>
   <div class="card-body p-1">

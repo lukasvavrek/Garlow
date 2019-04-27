@@ -57,6 +57,31 @@ namespace Garlow.API.Controllers
             return Ok(locationToReturn);
         }
 
+        [HttpDelete("{locationId}")]
+        public async Task<IActionResult> DeleteLocation(int locationId)
+        {
+            var location = await _garlowRepository.GetLocation(locationId);
+
+            if (location.UserId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                return Unauthorized();
+
+            if (location.PublicId != null)
+            {
+                var result = _photoUploader.DestroyPhoto(location.PhotoPublicId);
+                
+                if (result.Result == "ok")
+                    _garlowRepository.Delete(location);
+            }
+
+            if (location.PublicId == null)
+                _garlowRepository.Delete(location);
+
+            if (await _garlowRepository.SaveAll())
+                return Ok();
+
+            return BadRequest();
+        }
+
         [HttpPost("foruser/{userId}")]
         public async Task<IActionResult> CreateLocationForUser(int userId, [FromForm] LocationToCreateDto locationToCreate)
         {
