@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Garlow.API.Data;
 using Garlow.API.Dtos;
+using Garlow.API.Helpers;
 using Garlow.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -76,6 +78,8 @@ namespace Garlow.API.Controllers
             locationToCreate.PhotoPublicId = uploadResult.PublicId;
             // 3 - store location in database
             var location = _mapper.Map<Location>(locationToCreate);
+            location.PublicId = Guid.NewGuid().ToString();
+            location.SecretKey = SecretKeyGenerator.New();
             userFromRepo.Locations.Add(location);
 
             if (await _garlowRepository.SaveAll())

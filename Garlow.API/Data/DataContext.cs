@@ -11,5 +11,13 @@ namespace Garlow.API.Data
         public DbSet<Location> Locations { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder
+                .Entity<Location>()
+                .HasIndex(l => l.PublicId)
+                .IsUnique();
+        }
     }
 }

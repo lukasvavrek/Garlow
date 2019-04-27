@@ -1,8 +1,13 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace Garlow.API.Models
 {
     public class Location
     {
         public int Id { get; set; }
+        public string PublicId { get; set; }
+        public string SecretKey { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
 
