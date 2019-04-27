@@ -14,11 +14,11 @@
                     </div>
                     <div>
                         <strong>Public Id:</strong>
-                        <p>{{location.publicId}}</p>
+                        <p><button class="copy-to-clipboard-btn mr-2" ngxClipboard [cbContent]="location.publicId"><i class="fa fa-clipboard"></i></button>{{location.publicId}}</p>
                     </div>
                     <div>
                         <strong>Secret Key:</strong>
-                        <p>{{location.secretKey}}</p>
+                        <p><button class="copy-to-clipboard-btn mr-2" ngxClipboard [cbContent]="location.secretKey"><i class="fa fa-clipboard"></i></button>{{location.secretKey}}</p>
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-primary w-100" (click)="deleteLocation()">Delete</button>
