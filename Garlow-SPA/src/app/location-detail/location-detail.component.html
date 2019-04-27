@@ -29,11 +29,20 @@
         <div class="col-sm-7">
             <div class="tab-panel">
                 <tabset class="member-tabset">
-                <tab heading="About {{location.name}}">
-                    <h4>Description</h4>
-                    <p>{{location.name}}</p>
-                    <h4>Looking For</h4>
-                    <p>{{location.name}}</p>
+                <tab heading="Live Data">
+                    <div class="flex-item">
+                        <div style="display: block;">
+                            <canvas baseChart height="200"
+                                        [datasets]="lineChartData"
+                                        [labels]="lineChartLabels"
+                                        [options]="lineChartOptions"
+                                        [colors]="lineChartColors"
+                                        [legend]="false"
+                                        [chartType]="'line'"
+                                        (chartHover)="chartHovered($event)"
+                                        (chartClick)="chartClicked($event)"></canvas>
+                        </div>
+                    </div>
                 </tab>
                 <tab heading="Interests">
                     <h4>Interests</h4>

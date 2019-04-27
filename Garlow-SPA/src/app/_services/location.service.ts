@@ -30,4 +30,8 @@ export class LocationService {
     formData.append('address', location.address);
     return this.http.post(this.baseUrl + 'locations/foruser/' + userId, formData);
   }
+
+  getMovements(locationId: number) {
+    return this.http.get(this.baseUrl + 'movements/' + locationId);
+  }
 }

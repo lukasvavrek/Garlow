@@ -15,5 +15,7 @@ namespace Garlow.API.Data
         Task<Photo> GetMainPhotoForUser(int userId);
         Task<IEnumerable<Location>> GetLocationsForUser(int userId);
         Task<Location> GetLocation(int locationId);
+        Task<Location> GetLocation(string publicId, string secretKey);
+        Task<IEnumerable<Movement>> GetMovements(int locationId);
     }
 }

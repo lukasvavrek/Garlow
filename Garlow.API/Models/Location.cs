@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Garlow.API.Models
@@ -16,5 +17,7 @@ namespace Garlow.API.Models
         
         public int UserId { get; set; }
         public User User { get; set; }
+
+        public ICollection<Movement> Movements { get; set; }
     }
 }

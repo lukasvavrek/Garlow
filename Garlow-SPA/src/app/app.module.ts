@@ -8,6 +8,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
 import { ClipboardModule } from 'ngx-clipboard';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -38,6 +39,7 @@ import { LocationService } from './_services/location.service';
 import { LocationCardComponent } from './location-card/location-card.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { LocationDetailResolver } from './_resolvers/location-detail.resolver';
+import { LocationDetailMovementsResolver } from './_resolvers/location-detail-movements.resolver';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -72,6 +74,7 @@ export function tokenGetter() {
       NgxGalleryModule,
       FileUploadModule,
       ClipboardModule,
+      ChartsModule,
       JwtModule.forRoot({
          config: {
             tokenGetter,
@@ -92,7 +95,8 @@ export function tokenGetter() {
       PreventUnsavedChanges,
       LocationsListResolver,
       LocationService,
-      LocationDetailResolver
+      LocationDetailResolver,
+      LocationDetailMovementsResolver
    ],
    bootstrap: [
       AppComponent

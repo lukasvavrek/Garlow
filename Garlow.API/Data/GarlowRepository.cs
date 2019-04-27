@@ -59,5 +59,16 @@ namespace Garlow.API.Data
         {
             return await _context.Locations.SingleOrDefaultAsync(l => l.Id == locationId);
         }
+
+        public async Task<Location> GetLocation(string publicId, string secretKey)
+        {
+            return await _context.Locations.Include(l => l.Movements).SingleOrDefaultAsync(l => l.PublicId == publicId && l.SecretKey == secretKey);
+        }
+
+        public async Task<IEnumerable<Movement>> GetMovements(int locationId)
+        {
+            var location = await _context.Locations.Include(l => l.Movements).SingleOrDefaultAsync(l => l.Id == locationId);
+            return location.Movements;
+        }
     }
 }
