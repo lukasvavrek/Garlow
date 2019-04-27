@@ -37,8 +37,9 @@ namespace Garlow.API.Controllers
             // TODO: map to simpler dto, transform data
 
             var sums = movements
-                .Where(m => m.At.Date == DateTime.Today)
+                // .Where(m => m.At.Date == DateTime.Today)
                 .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}:{m.At.Second < 30}")
+                // .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}")
                 .Select(gr => new { Sum = gr.Sum(m => m.Direction)})
                 .ToArray();
 
