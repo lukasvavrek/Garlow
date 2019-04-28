@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.SignalR;
+using Garlow.API.HubConfig;
 
 namespace Garlow.API.Controllers
 {
@@ -17,10 +19,14 @@ namespace Garlow.API.Controllers
     public class MovementsController : ControllerBase
     {
         private readonly IGarlowRepository _garlowRepository;
+        private readonly IHubContext<MovementsChartHub> _hubContext;
         
-        public MovementsController(IGarlowRepository garlowRepository)
+        public MovementsController(
+            IGarlowRepository garlowRepository,
+            IHubContext<MovementsChartHub> hubContext)
         {
             _garlowRepository = garlowRepository;
+            _hubContext = hubContext;
         }
 
         [HttpGet("{locationId}")]
@@ -36,22 +42,27 @@ namespace Garlow.API.Controllers
             var movements = await _garlowRepository.GetMovements(locationId);
             // TODO: map to simpler dto, transform data
 
-            var sums = movements
-                // .Where(m => m.At.Date == DateTime.Today)
-                .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}:{m.At.Second < 30}")
-                // .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}")
-                .Select(gr => new { Sum = gr.Sum(m => m.Direction)})
-                .ToArray();
-
-            var counts = new List<int> { 0 };
-            for (var i = 0; i < sums.Count(); i++)
-            {
-                counts.Add(sums[i].Sum + counts[i]);
-            }
-
             return Ok(new {
-                Counts = counts
+                Counts = movements.TakeLast(20).Select(m => m.Direction).ToArray()
             });
+
+
+            // var sums = movements
+            //     // .Where(m => m.At.Date == DateTime.Today)
+            //     .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}:{m.At.Second < 30}")
+            //     // .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}")
+            //     .Select(gr => new { Sum = gr.Sum(m => m.Direction)})
+            //     .ToArray();
+
+            // var counts = new List<int> { 0 };
+            // for (var i = 0; i < sums.Count(); i++)
+            // {
+            //     counts.Add(sums[i].Sum + counts[i]);
+            // }
+
+            // return Ok(new {
+            //     Counts = counts
+            // });
         }
 
         [HttpPost("in")]
@@ -81,7 +92,10 @@ namespace Garlow.API.Controllers
             });
 
             if (await _garlowRepository.SaveAll())
+            {
+                await _hubContext.Clients.All.SendAsync("remote-method", $"{movement}");
                 return Ok();
+            }
 
             return BadRequest("Failed to log movement.");
         }

@@ -40,6 +40,7 @@ import { LocationCardComponent } from './location-card/location-card.component';
 import { LocationDetailComponent } from './location-detail/location-detail.component';
 import { LocationDetailResolver } from './_resolvers/location-detail.resolver';
 import { LocationDetailMovementsResolver } from './_resolvers/location-detail-movements.resolver';
+import { SignalRService } from './_services/signal-r.service';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -96,7 +97,8 @@ export function tokenGetter() {
       LocationsListResolver,
       LocationService,
       LocationDetailResolver,
-      LocationDetailMovementsResolver
+      LocationDetailMovementsResolver,
+      SignalRService
    ],
    bootstrap: [
       AppComponent

@@ -3,6 +3,7 @@ using System.Text;
 using AutoMapper;
 using Garlow.API.Data;
 using Garlow.API.Helpers;
+using Garlow.API.HubConfig;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -30,11 +31,22 @@ namespace Garlow.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddSignalR();
             services
                 .AddMvc()
                 .AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                {
+                    builder
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                });
+            });
 
             services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
 
@@ -80,8 +92,14 @@ namespace Garlow.API
             // seeder.SeedUsers();
 
             app.UseHttpsRedirection();
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            // app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            app.UseCors("CorsPolicy");
+
             app.UseAuthentication();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<MovementsChartHub>("/api/signalr");
+            });
             app.UseMvc();
         }
     }

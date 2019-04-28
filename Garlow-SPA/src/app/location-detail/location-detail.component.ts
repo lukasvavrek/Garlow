@@ -7,6 +7,7 @@ import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Color, BaseChartDirective, Label } from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import { MovementsChart } from '../_models/movements-chart';
+import { SignalRService } from '../_services/signal-r.service';
 
 @Component({
   selector: 'app-location-detail',
@@ -50,7 +51,8 @@ export class LocationDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private locationService: LocationService,
     private router: Router,
-    private alertify: AlertifyService) { }
+    private alertify: AlertifyService,
+    private signalrService: SignalRService) { }
 
   ngOnInit() {
     this.route.data.subscribe(data => {
@@ -60,12 +62,31 @@ export class LocationDetailComponent implements OnInit {
 
       this.lineChartData.push({ data: movements.counts, label: '' });
 
+      const counts: number[] = [];
+      let last = 0;
       for (const movement of movements.counts) {
-      //   this.alertify.message('' + movement);
-      //   this.lineChartData[0].data.push(movement);
+        const toAdd = +movement + +last;
+        counts.push(toAdd);
+        last = toAdd;
+
         this.lineChartLabels.push(['']);
       }
+      this.lineChartData[0].data = counts;
       /* tslint:enable:no-string-literal */
+    });
+    this.signalrService.startConnection();
+    this.signalrService.listenForMovements((direction) => {
+      const data = this.lineChartData[0].data as number[];
+      const last = data[data.length - 1];
+      if (data.length >= 30) {
+        data.shift();
+        this.lineChartLabels.shift();
+      }
+      direction = +last + +direction;
+      this.alertify.message('' + direction);
+      data.push(direction);
+      this.lineChartLabels.push('');
+      this.chart.update();
     });
   }
 
