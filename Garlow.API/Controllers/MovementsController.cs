@@ -42,7 +42,12 @@ namespace Garlow.API.Controllers
             var movements = await _garlowRepository.GetMovements(locationId);
             // TODO: map to simpler dto, transform data
 
+            var lastMovements = movements.TakeLast(20).Select(m => m.Direction).ToArray();
+            var lastSum = lastMovements.Sum();
+            var sumUntilLast = movements.Sum(m => m.Direction) - lastSum;
+
             return Ok(new {
+                SumUntil = sumUntilLast,
                 Counts = movements.TakeLast(20).Select(m => m.Direction).ToArray()
             });
 

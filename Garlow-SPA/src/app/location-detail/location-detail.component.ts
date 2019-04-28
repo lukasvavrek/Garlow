@@ -60,10 +60,10 @@ export class LocationDetailComponent implements OnInit {
       this.location = data['location'];
       const movements = data['movements'] as MovementsChart;
 
-      this.lineChartData.push({ data: movements.counts, label: '' });
+      this.lineChartData.push({ data: [], label: '' });
 
       const counts: number[] = [];
-      let last = 0;
+      let last = movements.sumUntil;
       for (const movement of movements.counts) {
         const toAdd = +movement + +last;
         counts.push(toAdd);
@@ -77,7 +77,10 @@ export class LocationDetailComponent implements OnInit {
     this.signalrService.startConnection();
     this.signalrService.listenForMovements((direction) => {
       const data = this.lineChartData[0].data as number[];
-      const last = data[data.length - 1];
+      let last = 0;
+      if (data.length > 0) {
+        last = data[data.length - 1];
+      }
       if (data.length >= 30) {
         data.shift();
         this.lineChartLabels.shift();
