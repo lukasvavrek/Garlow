@@ -1,4 +1,6 @@
+import { Movement } from './movement';
+
 export interface MovementsChart {
     sumUntil: number;
-    counts: number[];
+    lastMovements: Movement[];
 }

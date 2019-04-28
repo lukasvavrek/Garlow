@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as signalR from '@aspnet/signalr';
 import { AlertifyService } from './alertify.service';
 import { environment } from 'src/environments/environment';
+import { Movement } from '../_models/movement';
 
 @Injectable({
   providedIn: 'root'
@@ -21,9 +22,9 @@ export class SignalRService {
       .catch(error => this.alertify.error(error));
   }
 
-  public listenForMovements(callback: (direction: number) => void) {
+  public listenForMovements(callback: (movement: Movement) => void) {
     this.hubConnection.on('remote-method', (data) => {
-      callback(data as number);
+      callback(data as Movement);
     });
   }
 }

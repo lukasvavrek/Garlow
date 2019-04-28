@@ -10,6 +10,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
 using Garlow.API.HubConfig;
+using Newtonsoft.Json;
+using AutoMapper;
 
 namespace Garlow.API.Controllers
 {
@@ -20,13 +22,16 @@ namespace Garlow.API.Controllers
     {
         private readonly IGarlowRepository _garlowRepository;
         private readonly IHubContext<MovementsChartHub> _hubContext;
+        private readonly IMapper _mapper;
         
         public MovementsController(
             IGarlowRepository garlowRepository,
-            IHubContext<MovementsChartHub> hubContext)
+            IHubContext<MovementsChartHub> hubContext,
+            IMapper mapper)
         {
             _garlowRepository = garlowRepository;
             _hubContext = hubContext;
+            _mapper = mapper;
         }
 
         [HttpGet("{locationId}")]
@@ -39,19 +44,15 @@ namespace Garlow.API.Controllers
             if (locationFromRepo.UserId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                 return Unauthorized();
 
-            var movements = await _garlowRepository.GetMovements(locationId);
+            var movements = (await _garlowRepository.GetMovements(locationId)).Where(m => m.At.Date == DateTime.Today.Date);
             // TODO: map to simpler dto, transform data
 
-            var lastMovements = movements.TakeLast(20).Select(m => m.Direction).ToArray();
-            var lastSum = lastMovements.Sum();
+            var lastMovements = movements.TakeLast(20).Select(m => new MovementToReturnDto { Direction = m.Direction, At = m.At }).ToArray();
+            var lastSum = lastMovements.Sum(m => m.Direction);
             var sumUntilLast = movements.Sum(m => m.Direction) - lastSum;
 
-            return Ok(new {
-                SumUntil = sumUntilLast,
-                Counts = movements.TakeLast(20).Select(m => m.Direction).ToArray()
-            });
-
-
+            return Ok(new GetMovementsDto { SumUntil = sumUntilLast, LastMovements = lastMovements });
+                
             // var sums = movements
             //     // .Where(m => m.At.Date == DateTime.Today)
             //     .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}:{m.At.Second < 30}")
@@ -90,15 +91,16 @@ namespace Garlow.API.Controllers
             if (locationFromRepo == null)
                 return BadRequest();
 
-            locationFromRepo.Movements.Add(new Movement
+            var dbMovement = new Movement
             {
                 At = DateTime.Now,
                 Direction = movement
-            });
+            };
+            locationFromRepo.Movements.Add(dbMovement);
 
             if (await _garlowRepository.SaveAll())
             {
-                await _hubContext.Clients.All.SendAsync("remote-method", $"{movement}");
+                await _hubContext.Clients.All.SendAsync("remote-method", _mapper.Map<MovementToReturnDto>(dbMovement));
                 return Ok();
             }
 

@@ -8,6 +8,7 @@ import { Color, BaseChartDirective, Label } from 'ng2-charts';
 import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import { MovementsChart } from '../_models/movements-chart';
 import { SignalRService } from '../_services/signal-r.service';
+import * as moment from 'moment/moment';
 
 @Component({
   selector: 'app-location-detail',
@@ -64,18 +65,18 @@ export class LocationDetailComponent implements OnInit {
 
       const counts: number[] = [];
       let last = movements.sumUntil;
-      for (const movement of movements.counts) {
-        const toAdd = +movement + +last;
+      for (const movement of movements.lastMovements) {
+        const toAdd = +movement.direction + +last;
         counts.push(toAdd);
         last = toAdd;
 
-        this.lineChartLabels.push(['']);
+        this.lineChartLabels.push([moment(movement.at).format('LTS')]);
       }
       this.lineChartData[0].data = counts;
       /* tslint:enable:no-string-literal */
     });
     this.signalrService.startConnection();
-    this.signalrService.listenForMovements((direction) => {
+    this.signalrService.listenForMovements((movement) => {
       const data = this.lineChartData[0].data as number[];
       let last = 0;
       if (data.length > 0) {
@@ -85,10 +86,9 @@ export class LocationDetailComponent implements OnInit {
         data.shift();
         this.lineChartLabels.shift();
       }
-      direction = +last + +direction;
-      this.alertify.message('' + direction);
+      const direction = +last + +movement.direction;
       data.push(direction);
-      this.lineChartLabels.push('');
+      this.lineChartLabels.push(moment(movement.at).format('LTS'));
       this.chart.update();
     });
   }

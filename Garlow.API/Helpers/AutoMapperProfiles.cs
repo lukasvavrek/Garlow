@@ -29,6 +29,7 @@ namespace Garlow.API.Helpers
             CreateMap<Photo, PhotoForReturnDto>();
             CreateMap<Location, LocationToReturnDto>();
             CreateMap<LocationToCreateDto, Location>();
+            CreateMap<Movement, MovementToReturnDto>();
         }
     }
 }
