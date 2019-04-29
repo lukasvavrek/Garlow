@@ -20,8 +20,7 @@ export class AppComponent implements OnInit {
       this.authService.decodedToken = this.jwtHelper.decodeToken(token);
     }
     if (user) {
-      this.authService.currentUser = user;
-      this.authService.changeMemberPhoto(user.photoUrl);
+      this.authService.restoreUser(user);
     }
   }
 }

@@ -52,8 +52,6 @@ export function tokenGetter() {
       NavComponent,
       HomeComponent,
       RegisterComponent,
-      MemberListComponent,
-      ListsComponent,
       MessagesComponent,
       MemberCardComponent,
       MemberDetailComponent,

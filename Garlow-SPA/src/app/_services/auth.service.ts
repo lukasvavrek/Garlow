@@ -13,7 +13,11 @@ export class AuthService {
   baseUrl = environment.apiUrl + 'auth/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
+
   currentUser: User;
+  currentUserBS = new BehaviorSubject<User>(null);
+  currentUserOBS = this.currentUserBS.asObservable();
+
   photoUrl = new BehaviorSubject<string>('../../assets/user.png');
   currentPhotoUrl = this.photoUrl.asObservable();
 
@@ -32,6 +36,7 @@ export class AuthService {
             localStorage.setItem('token', user.token);
             localStorage.setItem('user', JSON.stringify(user.user));
             this.currentUser = user.user;
+            this.currentUserBS.next(user.user);
             this.decodedToken = this.jwtHelper.decodeToken(user.token);
             this.changeMemberPhoto(this.currentUser.photoUrl);
           }
@@ -46,5 +51,17 @@ export class AuthService {
   loggedIn() {
     const token = localStorage.getItem('token');
     return !this.jwtHelper.isTokenExpired(token);
+  }
+
+  logout() {
+    this.decodedToken = null;
+    this.currentUser = null;
+    this.currentUserBS.next(null);
+  }
+
+  restoreUser(user: User) {
+    this.currentUser = user;
+    this.currentUserBS.next(user);
+    this.changeMemberPhoto(user.photoUrl);
   }
 }
