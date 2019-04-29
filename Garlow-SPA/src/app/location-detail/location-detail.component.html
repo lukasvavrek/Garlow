@@ -29,31 +29,22 @@
         <div class="col-sm-7">
             <div class="tab-panel">
                 <tabset class="member-tabset">
-                <tab heading="Live Data">
-                    <div class="flex-item">
-                        <div style="display: block;">
-                            <canvas baseChart height="200"
-                                        [datasets]="lineChartData"
-                                        [labels]="lineChartLabels"
-                                        [options]="lineChartOptions"
-                                        [colors]="lineChartColors"
-                                        [legend]="false"
-                                        [chartType]="'line'"
-                                        (chartHover)="chartHovered($event)"
-                                        (chartClick)="chartClicked($event)"></canvas>
+                    <tab heading="Live Data">
+                        <div class="flex-item">
+                            <div style="display: block;">
+                                <canvas 
+                                    baseChart height="200"
+                                    [datasets]="lineChartData"
+                                    [labels]="lineChartLabels"
+                                    [options]="lineChartOptions"
+                                    [colors]="lineChartColors"
+                                    [legend]="false"
+                                    [chartType]="'line'"
+                                    (chartHover)="chartHovered($event)"
+                                    (chartClick)="chartClicked($event)"></canvas>
+                            </div>
                         </div>
-                    </div>
-                </tab>
-                <tab heading="Interests">
-                    <h4>Interests</h4>
-                    <p>{{location.name}}</p>
-                </tab>
-                <tab heading="Photos">
-                    <!-- <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery> -->
-                </tab>
-                <tab heading="Messages">
-                    <p>Messages will go here</p>
-                </tab>
+                    </tab>
                 </tabset>
             </div>
         </div>
