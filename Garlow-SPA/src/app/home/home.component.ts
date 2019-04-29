@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../_services/auth.service';
-import { AlertifyService } from '../_services/alertify.service';
 
 @Component({
   selector: 'app-home',
@@ -13,10 +11,7 @@ export class HomeComponent implements OnInit {
   values: any;
   anonymousMode = true;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private alertify: AlertifyService) { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit() {
     this.authService.currentUserOBS.subscribe(currentUser => {
@@ -24,7 +19,6 @@ export class HomeComponent implements OnInit {
         this.anonymousMode = false;
       } else {
         this.anonymousMode = true;
-        this.alertify.message('fooo');
       }
     });
   }
