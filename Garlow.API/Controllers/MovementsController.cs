@@ -45,30 +45,11 @@ namespace Garlow.API.Controllers
                 return Unauthorized();
 
             var movements = (await _garlowRepository.GetMovements(locationId)).Where(m => m.At.Date == DateTime.Today.Date);
-            // TODO: map to simpler dto, transform data
-
             var lastMovements = movements.TakeLast(20).Select(m => new MovementToReturnDto { Direction = m.Direction, At = m.At }).ToArray();
             var lastSum = lastMovements.Sum(m => m.Direction);
             var sumUntilLast = movements.Sum(m => m.Direction) - lastSum;
 
             return Ok(new GetMovementsDto { SumUntil = sumUntilLast, LastMovements = lastMovements });
-                
-            // var sums = movements
-            //     // .Where(m => m.At.Date == DateTime.Today)
-            //     .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}:{m.At.Second < 30}")
-            //     // .GroupBy(m => $"{m.At.Hour}:{m.At.Minute}")
-            //     .Select(gr => new { Sum = gr.Sum(m => m.Direction)})
-            //     .ToArray();
-
-            // var counts = new List<int> { 0 };
-            // for (var i = 0; i < sums.Count(); i++)
-            // {
-            //     counts.Add(sums[i].Sum + counts[i]);
-            // }
-
-            // return Ok(new {
-            //     Counts = counts
-            // });
         }
 
         [HttpPost("in")]

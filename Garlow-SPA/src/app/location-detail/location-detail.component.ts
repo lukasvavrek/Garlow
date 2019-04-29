@@ -5,10 +5,10 @@ import { LocationService } from '../_services/location.service';
 import { AlertifyService } from '../_services/alertify.service';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { Color, BaseChartDirective, Label } from 'ng2-charts';
-import * as pluginAnnotations from 'chartjs-plugin-annotation';
 import { MovementsChart } from '../_models/movements-chart';
 import { SignalRService } from '../_services/signal-r.service';
 import * as moment from 'moment/moment';
+import { Movement } from '../_models/movement';
 
 @Component({
   selector: 'app-location-detail',
@@ -60,37 +60,43 @@ export class LocationDetailComponent implements OnInit {
       /* tslint:disable:no-string-literal */
       this.location = data['location'];
       const movements = data['movements'] as MovementsChart;
-
-      this.lineChartData.push({ data: [], label: '' });
-
-      const counts: number[] = [];
-      let last = movements.sumUntil;
-      for (const movement of movements.lastMovements) {
-        const toAdd = +movement.direction + +last;
-        counts.push(toAdd);
-        last = toAdd;
-
-        this.lineChartLabels.push([moment(movement.at).format('LTS')]);
-      }
-      this.lineChartData[0].data = counts;
       /* tslint:enable:no-string-literal */
+      this.initMovementsChartWithData(movements);
     });
     this.signalrService.startConnection();
-    this.signalrService.listenForMovements((movement) => {
-      const data = this.lineChartData[0].data as number[];
-      let last = 0;
-      if (data.length > 0) {
-        last = data[data.length - 1];
-      }
-      if (data.length >= 30) {
-        data.shift();
-        this.lineChartLabels.shift();
-      }
-      const direction = +last + +movement.direction;
-      data.push(direction);
-      this.lineChartLabels.push(moment(movement.at).format('LTS'));
-      this.chart.update();
-    });
+    this.signalrService.listenForMovements((movement) => this.appendMovement(movement));
+  }
+
+  initMovementsChartWithData(movements: MovementsChart) {
+    this.lineChartData.push({ data: [], label: '' });
+
+    const counts: number[] = [];
+    let last = movements.sumUntil;
+    for (const movement of movements.lastMovements) {
+      const toAdd = +movement.direction + +last;
+      counts.push(toAdd);
+      last = toAdd;
+
+      this.lineChartLabels.push([moment(movement.at).format('LTS')]);
+    }
+    this.lineChartData[0].data = counts;
+  }
+
+  appendMovement(movement: Movement) {
+    const data = this.lineChartData[0].data as number[];
+    let last = 0;
+    if (data.length > 0) {
+      last = data[data.length - 1];
+    }
+    if (data.length >= 30) {
+      data.shift();
+      this.lineChartLabels.shift();
+    }
+    const direction = +last + +movement.direction;
+
+    data.push(direction);
+    this.lineChartLabels.push(moment(movement.at).format('LTS'));
+    this.chart.update();
   }
 
   deleteLocation() {
