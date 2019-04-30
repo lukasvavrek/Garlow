@@ -34,6 +34,7 @@ import { LocationDetailComponent } from './location-detail/location-detail.compo
 import { LocationDetailResolver } from './_resolvers/location-detail.resolver';
 import { LocationDetailMovementsResolver } from './_resolvers/location-detail-movements.resolver';
 import { SignalRService } from './_services/signal-r.service';
+import { environment } from 'src/environments/environment.prod';
 
 export function tokenGetter() {
    return localStorage.getItem('token');
@@ -67,8 +68,8 @@ export function tokenGetter() {
       JwtModule.forRoot({
          config: {
             tokenGetter,
-            whitelistedDomains: ['localhost:5001'],
-            blacklistedRoutes: ['localhost:5001/api/auth']
+            whitelistedDomains: [environment.whitelistedDomain],
+            blacklistedRoutes: [environment.blacklistedDomain]
          }
       })
    ],
