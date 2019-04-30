@@ -20,6 +20,8 @@ namespace Garlow.API
 {
     public class Startup
     {
+        private IHostingEnvironment _currentEnvironment;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -40,8 +42,12 @@ namespace Garlow.API
             {
                 options.AddPolicy("CorsPolicy", builder =>
                 {
+                    if (_currentEnvironment.IsDevelopment())
+                        builder.WithOrigins("http://localhost:4200");
+                    else
+                        builder.WithExposedHeaders("https://ta-ja.github.com/Garlow");
+
                     builder
-                        .WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials();
@@ -71,7 +77,9 @@ namespace Garlow.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seed seeder)
         {
-            if (false && env.IsDevelopment())
+            _currentEnvironment = env;
+
+            if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
             {
