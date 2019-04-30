@@ -34,7 +34,7 @@ import { LocationDetailComponent } from './location-detail/location-detail.compo
 import { LocationDetailResolver } from './_resolvers/location-detail.resolver';
 import { LocationDetailMovementsResolver } from './_resolvers/location-detail-movements.resolver';
 import { SignalRService } from './_services/signal-r.service';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 
 export function tokenGetter() {
    return localStorage.getItem('token');

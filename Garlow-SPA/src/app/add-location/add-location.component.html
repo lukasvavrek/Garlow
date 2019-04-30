@@ -13,7 +13,7 @@
     <div class="col-sm-4">
       <div class="card">
         <img [src]="imgURL" class="card-img-top img-thumbnail" *ngIf="imgURL">
-        <img src="../../../assets/no-thumbnail.jpg" class="card-img-top img-thumbnail" *ngIf="!imgURL">
+        <img src="assets/no-thumbnail.jpg" class="card-img-top img-thumbnail" *ngIf="!imgURL">
         <div class="card-body">
             <div class="card-footer">
                 <button [disabled]="!editForm.dirty" form="createForm" class="btn btn-success btn-block">Save Changes</button>
