@@ -19,6 +19,9 @@ namespace Garlow.Generator
 
             [Option('s', "start", Default = 0, Required = true, HelpText = "SecretKey of Location.")]
             public int Start { get; set; }
+
+            [Option('e', "environment", Default = "dev", Required = true, HelpText = "Environment.")]
+            public string Environment { get; set; }
         }
 
         public class Auth
@@ -31,7 +34,8 @@ namespace Garlow.Generator
         static void Main(string[] args)
         {
             var random = new Random();
-            
+            var urlFormat = "https://localhost:5001/api/movements/{0}";
+
             var count = 0;
             var trend = 1;
             const int minCount = 0;
@@ -51,6 +55,9 @@ namespace Garlow.Generator
                         SecretKey = options.SecretKey
                     });
                     count = options.Start;
+
+                    if (options.Environment == "prod")
+                        urlFormat = "https://garlow.azurewebsites.net/api/movements/{0}";
                 })
                 .WithNotParsed<Options>(_ => Environment.Exit(0));
 
@@ -77,8 +84,8 @@ namespace Garlow.Generator
                 count += trend;
 
                 var trendApi = trend > 0 ? "in" : "out";
-                var url = $"https://localhost:5001/api/movements/{trendApi}";
                 // send trend information to the server
+                var url = string.Format(urlFormat, trendApi);
                 var content = new StringContent(authJson, Encoding.UTF8, "application/json");
                 var result = client.PostAsync(url, content).Result;
 
