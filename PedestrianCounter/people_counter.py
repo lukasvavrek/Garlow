@@ -21,6 +21,9 @@ import time
 import dlib
 import cv2
 
+import sys
+import requests
+
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", required=True,
@@ -35,7 +38,22 @@ ap.add_argument("-c", "--confidence", type=float, default=0.4,
 	help="minimum probability to filter weak detections")
 ap.add_argument("-s", "--skip-frames", type=int, default=30,
 	help="# of skip frames between detections")
+
+ap.add_argument("-b", "--publicid", type=str, default="",
+	help="public id to use during auth")
+ap.add_argument("-k", "--secretkey", type=str, default="",
+	help="secret key to use during auth")
 args = vars(ap.parse_args())
+
+# build verification json content
+if len(args["publicid"]) == 0 or len(args["secretkey"]) == 0:
+	print("Invalid PublicId and/or SecretKey.")
+	sys.exit(1)
+authJsonContent = {'PublicId': args["publicid"], 'SecretKey': args["secretkey"]}
+apiUrl = "https://garlow.azurewebsites.net/api/movements/"
+#apiUrl = 'https://localhost:5001/api/movements/'
+
+visualMode = False
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect
@@ -189,7 +207,8 @@ while True:
 	# draw a horizontal line in the center of the frame -- once an
 	# object crosses this line we will determine whether they were
 	# moving 'up' or 'down'
-	cv2.line(frame, (0, H // 2), (W, H // 2), (0, 255, 255), 2)
+	if visualMode == True:
+		cv2.line(frame, (0, H // 2), (W, H // 2), (0, 255, 255), 2)
 
 	# use the centroid tracker to associate the (1) old object
 	# centroids with (2) the newly computed object centroids
@@ -224,6 +243,8 @@ while True:
 				if direction < 0 and centroid[1] < H // 2:
 					totalUp += 1
 					to.counted = True
+					r = requests.post(apiUrl + "in", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
+					print(r.status_code, r.reason)
 
 				# if the direction is positive (indicating the object
 				# is moving down) AND the centroid is below the
@@ -231,16 +252,19 @@ while True:
 				elif direction > 0 and centroid[1] > H // 2:
 					totalDown += 1
 					to.counted = True
+					r = requests.post(apiUrl + "out", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
+					print(r.status_code, r.reason)
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to
 
 		# draw both the ID of the object and the centroid of the
 		# object on the output frame
-		text = "ID {}".format(objectID)
-		cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-		cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
+		if visualMode == True:
+			text = "ID {}".format(objectID)
+			cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
+				cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+			cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
 	# construct a tuple of information we will be displaying on the
 	# frame
@@ -251,17 +275,19 @@ while True:
 	]
 
 	# loop over the info tuples and draw them on our frame
-	for (i, (k, v)) in enumerate(info):
-		text = "{}: {}".format(k, v)
-		cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-			cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+	if visualMode == True:
+		for (i, (k, v)) in enumerate(info):
+			text = "{}: {}".format(k, v)
+			cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
+				cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
 	# check to see if we should write the frame to disk
 	if writer is not None:
 		writer.write(frame)
 
 	# show the output frame
-	cv2.imshow("Frame", frame)
+	if visualMode == True:
+		cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
 
 	# if the `q` key was pressed, break from the loop

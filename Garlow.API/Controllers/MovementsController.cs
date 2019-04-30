@@ -71,14 +71,14 @@ namespace Garlow.API.Controllers
             var locationFromRepo = await _garlowRepository.GetLocation(verificationDto.PublicId, verificationDto.SecretKey);
             if (locationFromRepo == null)
                 return BadRequest();
-
+            System.Console.Write("fuuuk");
             var dbMovement = new Movement
             {
                 At = DateTime.Now,
                 Direction = movement
             };
             locationFromRepo.Movements.Add(dbMovement);
-
+System.Console.Write("fuuuk2");
             if (await _garlowRepository.SaveAll())
             {
                 await _hubContext.Clients.All.SendAsync("remote-method", _mapper.Map<MovementToReturnDto>(dbMovement));
