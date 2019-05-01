@@ -43,17 +43,25 @@ ap.add_argument("-b", "--publicid", type=str, default="",
 	help="public id to use during auth")
 ap.add_argument("-k", "--secretkey", type=str, default="",
 	help="secret key to use during auth")
+ap.add_argument("-v", "--visual", type=str, default="",
+	help="turn on the visual mode")
 args = vars(ap.parse_args())
+
+# global switches
+visualMode = False
+notifyMode = True
 
 # build verification json content
 if len(args["publicid"]) == 0 or len(args["secretkey"]) == 0:
 	print("Invalid PublicId and/or SecretKey.")
-	sys.exit(1)
+	notifyMode = False
+
+if args["visual"] == "yes":
+	visualMode = True
+
 authJsonContent = {'PublicId': args["publicid"], 'SecretKey': args["secretkey"]}
 apiUrl = "https://garlow.azurewebsites.net/api/movements/"
 #apiUrl = 'https://localhost:5001/api/movements/'
-
-visualMode = False
 
 # initialize the list of class labels MobileNet SSD was trained to
 # detect
@@ -243,8 +251,9 @@ while True:
 				if direction < 0 and centroid[1] < H // 2:
 					totalUp += 1
 					to.counted = True
-					r = requests.post(apiUrl + "in", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
-					print(r.status_code, r.reason)
+					if notifyMode == True:
+						r = requests.post(apiUrl + "in", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
+						print(r.status_code, r.reason)
 
 				# if the direction is positive (indicating the object
 				# is moving down) AND the centroid is below the
@@ -252,8 +261,9 @@ while True:
 				elif direction > 0 and centroid[1] > H // 2:
 					totalDown += 1
 					to.counted = True
-					r = requests.post(apiUrl + "out", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
-					print(r.status_code, r.reason)
+					if notifyMode == True:
+						r = requests.post(apiUrl + "out", json=authJsonContent, headers={'content-type':'application/json'}, verify=False)
+						print(r.status_code, r.reason)
 
 		# store the trackable object in our dictionary
 		trackableObjects[objectID] = to

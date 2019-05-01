@@ -61,6 +61,8 @@ namespace Garlow.Generator
                 })
                 .WithNotParsed<Options>(_ => Environment.Exit(0));
 
+            Console.WriteLine($"Url format: {urlFormat}");
+
             Console.WriteLine($"Serialized auth: {authJson}");
 
             Console.WriteLine($"Garlow data generator:");
@@ -76,9 +78,9 @@ namespace Garlow.Generator
                     trend = -trend;
 
                 // check for boundaries
-                if (count == minCount)
+                if (count <= minCount)
                     trend = 1;
-                else if (count == maxCount)
+                else if (count >= maxCount)
                     trend = -1;
 
                 count += trend;
